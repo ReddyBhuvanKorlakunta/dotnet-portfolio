@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "reference": "CA-2026-1042",
+    "title": "Benefits review \u2014 housing support",
+    "type": "BenefitsReview",
+    "status": "Approved",
+    "priority": "Normal",
+    "assignedTo": null,
+    "createdAt": "2026-10-20T00:00:00Z"
+  },
+  {
+    "id": 2,
+    "reference": "CA-2026-1043",
+    "title": "Document check \u2014 identity proof",
+    "type": "DocumentCheck",
+    "status": "InReview",
+    "priority": "High",
+    "assignedTo": "worker@example.test",
+    "createdAt": "2026-10-21T00:00:00Z"
+  }
+]

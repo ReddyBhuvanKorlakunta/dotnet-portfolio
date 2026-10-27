@@ -1,0 +1,19 @@
+@using EnterprisePortal.Application.Common
+@model PagedResult<EnterprisePortal.Application.Cases.CaseListItem>
+<h1>Cases</h1>
+<form method="get" role="search">
+  <label for="search">Search</label>
+  <input id="search" name="Search" value="@Context.Request.Query["Search"]" type="search">
+  <button type="submit">Search</button>
+</form>
+<table>
+<thead><tr><th scope="col">Reference</th><th scope="col">Title</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col"></th></tr></thead>
+<tbody>
+@foreach (var c in Model.Items)
+{
+  <tr><td>@c.Reference</td><td>@c.Title</td><td>@c.Status</td><td>@c.CreatedAt.ToString("yyyy-MM-dd")</td>
+  <td><a asp-action="Details" asp-route-id="@c.Id">View</a></td></tr>
+}
+</tbody>
+</table>
+<p>Page @Model.Page of @Model.TotalPages — @Model.Total cases. API: <code>GET /api/v1/cases</code> (JWT, role: CaseWorker or Admin).</p>

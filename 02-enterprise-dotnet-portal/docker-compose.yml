@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "DevOnly123!"
+      ACCEPT_EULA: "Y"
+    ports: ["1433:1433"]
+  web:
+    build: .
+    environment:
+      ConnectionStrings__Default: "Server=db;Database=EnterprisePortal;User Id=sa;Password=DevOnly123!;TrustServerCertificate=True"
+      Encryption__Key: "dev-only-change-me"
+      Jwt__Key: "dev-only-change-me-jwt-key-must-be-at-least-32-chars"
+    ports: ["5000:8080"]
+    depends_on: [db]

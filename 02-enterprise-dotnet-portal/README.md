@@ -1,45 +1,65 @@
-# Enterprise Portal — ASP.NET Core MVC + Web Forms (legacy) + API
+# Enterprise Portal — Clean Architecture .NET 8
 
-Dummy public-services case-management domain. No real personal, classified
-or health data anywhere in this repo — seed data is invented.
+Dummy public-services case-management system. No real personal, health or
+classified data anywhere in this repo.
 
-## Run it (needs .NET 8 SDK — not installed on the scaffold VM)
+## Run it
 ```
-cd src/EnterprisePortal
-dotnet run
-# then open https://localhost:5001 — MVC home page
-# API: GET /api/cases  (requires the demo role header — see CasesController)
+# Fastest, no SQL Server needed for the UI shell: the tests run without a DB.
+dotnet test src/EnterprisePortal.Tests
+
+# Full stack with SQL Server (Docker):
+docker compose up --build
+# web: http://localhost:5000   db: localhost:1433 (sa / DevOnly123! — dev only)
+
+# Or directly (needs .NET 8 SDK + SQL Server / LocalDB):
+cd src/EnterprisePortal.Web
+dotnet run -- seed          # applies migrations, seeds dummy cases
+dotnet run                  # https://localhost:5001
 ```
 
-## What each part proves
-- **MVC:** `Controllers/HomeController.cs` + `Views/` — Razor, layout, validation.
-- **Web Forms where it remains:** `legacy/WebForms/CaseDetail.aspx` + `.aspx.cs`
-  — the same case read path, kept working, with a migration note. Interview
-  point: Web Forms is page lifecycle + ViewState + server controls; MVC is
-  routing + controllers + separation of concerns. You do not rewrite a working
-  Web Forms page to MVC unless there is a reason — you wrap it, then migrate
-  page by page.
-- **API + middleware:** `Api/CasesController.cs`, `Middleware/` — security
-  headers, audit logging (who, what, when — never the sensitive value itself).
-- **SQL Server:** `sql/001_schema.sql`, `Data/AppDbContext.cs` — EF Core,
-  parameterised queries only, no string-built SQL.
-- **Encryption:** `Services/EncryptionService.cs` — AES-GCM for fields at rest
-  in code, ASP.NET Data Protection for tokens/cookies. Keys come from
-  configuration / Azure Key Vault in production — never committed. The demo
-  key in code is a dev-only placeholder and is labelled as such.
-- **CI/CD:** `azure-pipelines.yml` — restore, build, test, publish, deploy
-  stages. Branch protection + PR review is the source-control practice.
+## Login (dev only)
+```
+POST /api/v1/auth/login  {"email":"worker@example.test","password":"Worker123!"}
+# -> { token, role: "CaseWorker" }  — use: Authorization: Bearer <token>
+# admin@example.test / Admin123!  — production uses Entra ID, not these accounts.
+```
 
-## Production troubleshooting runbook
-1. Health: `GET /health` — if it fails, check app logs before restarting.
-2. Logs: correlate by request ID (audit middleware adds it to every log line).
-3. Bad deploy: roll back to the previous Azure DevOps release, do not hot-patch
-   production. 4. Database: check the migration applied, then the connection
-   string / firewall — never edit production data by hand without a ticket.
+## API
+```
+GET    /api/v1/cases?status=InReview&search=CA&page=1&pageSize=20&sort=CreatedAt_desc
+GET    /api/v1/cases/{id}
+POST   /api/v1/cases              (CaseWorker, Admin)
+PATCH  /api/v1/cases/{id}/status (CaseWorker, Admin)  {"status":"Approved"} / {"status":"Rejected","reason":"..."}
+GET    /health
+```
 
-## Security notes (state requirements, in general terms)
-Role-based access on every controller, least privilege on the SQL login,
-sensitive fields encrypted, audit trail retained, dummy data in every demo
-and screenshot. Handling of real classified data follows the agency's own
-handling rules — this repo does not demonstrate that with real data, and
-must never be used to carry it.
+## Layout
+```
+src/
+  EnterprisePortal.Domain/        Case aggregate + state machine, no dependencies
+  EnterprisePortal.Application/   CaseService, DTOs, pagination, Result, interfaces
+  EnterprisePortal.Infrastructure/ EF Core, SQL Server, repos, migrations, AES-GCM
+  EnterprisePortal.Web/           MVC UI + API v1, JWT auth, middleware, health
+  EnterprisePortal.Tests/         xUnit: domain transitions, service rules, encryption
+legacy/WebForms/                  Working legacy page + strangler migration plan
+docs/  ARCHITECTURE.md is at the portal root; runbook + strangler notes here
+```
+
+## Tests
+```
+dotnet test src/EnterprisePortal.Tests
+# Domain: illegal transitions, rejection reason, full happy path
+# Service: create encrypts notes, illegal status change is rejected (not crashed)
+# Security: AES-GCM roundtrip, tampered cipher fails
+```
+
+## What changed from the first scaffold, and why
+The first version was a single project with a controller, a DbContext and a
+demo encryption class. A senior reviewer would filter that: no layering, no
+tests, no auth, no migrations, no deployment story. This version is the
+opposite trade — more files, but every file earns its place: a rule is either
+in the domain (testable), in the application service (testable), or it is
+infrastructure (swappable). If you disagree with a choice, the ADR section in
+ARCHITECTURE.md says why it was made, so you can argue with it in interview
+instead of defending a mystery.

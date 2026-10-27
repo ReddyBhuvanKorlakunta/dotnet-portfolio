@@ -1,68 +1,52 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Responsive Front-End — Public Services Dashboard Demo</title>
-<meta name="description" content="Responsive HTML5 / Sass / JavaScript demo: dashboard, cards, interactive form, mobile navigation.">
-<link rel="stylesheet" href="css/main.css">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case Portal — Responsive Front-End</title>
+<meta name="description" content="Responsive case portal UI consuming the .NET API in 02-, with an offline dummy fallback.">
+<link rel="stylesheet" href="css/main.css"></head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
-<header class="header">
-  <div class="container header-inner">
-    <p class="logo">Public Services <span>Demo</span></p>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" id="nav-toggle">Menu</button>
-    <nav id="nav" aria-label="Main"><a href="#services">Services</a><a href="#dashboard">Dashboard</a><a href="#apply">Apply</a></nav>
-  </div>
-</header>
+<header class="header"><div class="container header-inner">
+<p class="logo">Case Portal <span>Demo</span></p>
+<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" id="nav-toggle">Menu</button>
+<nav id="nav" aria-label="Main"><a href="#cases">Cases</a><a href="#dashboard">Dashboard</a><a href="#apply">Apply</a></nav>
+</div></header>
 <main id="main" class="container">
-  <section class="hero">
-    <div>
-      <p class="eyebrow">HTML5 · Sass · JavaScript · Responsive</p>
-      <h1>Check a case, in plain language, on any device</h1>
-      <p class="lede">Designed mobile-first: one column on a phone, three on a desktop,
-      same content, same order, no hidden steps. That is the UX decision here —
-      not a separate mobile site.</p>
-      <a class="btn" href="#apply">Start a dummy application</a>
-    </div>
-    <div class="hero-card" aria-hidden="true"><p>CA-1042</p><p><strong>Approved</strong></p><p>$0 — dummy data</p></div>
-  </section>
+<section class="hero"><div><p class="eyebrow">HTML5 · Sass · JavaScript · API-driven</p>
+<h1>Check a case, in plain language, on any device</h1>
+<p class="lede">This UI is not a mockup with hard-coded cards. It fetches <code>GET /api/v1/cases</code>
+from the .NET portal in <code>02-</code> and falls back to <code>data/cases.json</code> when the API is not running,
+so a reviewer can see the data flow either way. See <code>js/api.js</code>.</p>
+<p id="api-status" role="status" aria-live="polite"></p></div>
+<div class="hero-card"><p>CA-2026-1042</p><p><strong>Approved</strong></p><p>Dummy data — $0</p></div></section>
 
-  <section id="services" aria-labelledby="svc-h">
-    <h2 id="svc-h">Services</h2>
-    <div class="grid">
-      <article class="card"><h3>Benefits review</h3><p>What you need, what happens next, and how long it takes — in that order.</p></article>
-      <article class="card"><h3>Document check</h3><p>Upload, review, and a clear yes/no — no jargon, no dead ends.</p></article>
-      <article class="card"><h3>Case tracking</h3><p>One status line, one next step. Status is text, never colour alone.</p></article>
-    </div>
-  </section>
+<section id="cases" aria-labelledby="cases-h"><h2 id="cases-h">Cases</h2>
+<form id="filter-form" role="search">
+<label for="f-search">Search</label><input id="f-search" name="search" type="search" placeholder="Reference, title or applicant">
+<label for="f-status">Status</label>
+<select id="f-status" name="status"><option value="">All statuses</option><option>Submitted</option><option>InReview</option><option>Approved</option><option>Rejected</option><option>Closed</option></select>
+<button class="btn" type="submit">Filter</button>
+</form>
+<div id="cases-list" aria-live="polite"><p>Loading cases…</p></div>
+</section>
 
-  <section id="dashboard" aria-labelledby="dash-h">
-    <h2 id="dash-h">Dashboard (dummy data)</h2>
-    <div class="stats" role="list">
-      <div role="listitem"><strong id="stat-a">—</strong><span>Cases in review</span></div>
-      <div role="listitem"><strong id="stat-b">—</strong><span>Approved this week</span></div>
-      <div role="listitem"><strong id="stat-c">—</strong><span>Average wait</span></div>
-    </div>
-    <p><button class="btn btn--secondary" type="button" id="refresh">Refresh dummy stats</button></p>
-  </section>
+<section id="dashboard" aria-labelledby="dash-h"><h2 id="dash-h">Dashboard</h2>
+<div class="stats" role="list">
+<div role="listitem"><strong id="stat-total">—</strong><span>Total cases</span></div>
+<div role="listitem"><strong id="stat-approved">—</strong><span>Approved</span></div>
+<div role="listitem"><strong id="stat-review">—</strong><span>In review</span></div>
+</div></section>
 
-  <section id="apply" aria-labelledby="apply-h">
-    <h2 id="apply-h">Apply — step pattern</h2>
-    <p>Progress is shown as steps, the current step is marked with
-    <code>aria-current="step"</code>, and completed steps stay reachable — users
-    can go back without losing data.</p>
-    <ol class="steps"><li aria-current="step">Your details</li><li>Documents</li><li>Review</li></ol>
-    <form id="apply-form" novalidate>
-      <label for="a-name">Full name</label>
-      <input id="a-name" type="text" autocomplete="name" required>
-      <p class="err" id="a-err" role="alert"></p>
-      <button class="btn" type="submit">Continue (demo only)</button>
-      <p id="a-out" role="status" aria-live="polite"></p>
-    </form>
-  </section>
+<section id="apply" aria-labelledby="apply-h"><h2 id="apply-h">Apply — step pattern</h2>
+<p>Progress is shown as steps, the current step uses <code>aria-current="step"</code>, and a draft is kept in session storage (dummy data only) so going back does not lose data.</p>
+<ol class="steps"><li aria-current="step" id="step-1">Your details</li><li id="step-2">Review</li></ol>
+<form id="apply-form" novalidate>
+<div id="apply-step-1"><label for="a-name">Full name</label><input id="a-name" type="text" autocomplete="name" required>
+<label for="a-title">Case title</label><input id="a-title" type="text" required>
+<button class="btn" type="button" id="to-step-2">Continue to review</button></div>
+<div id="apply-step-2" hidden><p id="review-text"></p><button class="btn" type="submit">Submit (demo only)</button> <button class="btn btn--secondary" type="button" id="back-step-1">Back</button></div>
+<p class="err" id="a-err" role="alert"></p><p id="a-out" role="status" aria-live="polite"></p>
+</form></section>
 </main>
-<footer class="container"><p>Dummy data only. See <code>docs/ux-notes.md</code> for layout, interaction and designer-collaboration notes.</p></footer>
-<script src="js/main.js"></script>
-</body>
-</html>
+<footer class="container"><p>Dummy data only. See <code>docs/ux-notes.md</code> and the API in <code>02-enterprise-dotnet-portal</code>.</p></footer>
+<script type="module" src="js/main.js"></script>
+</body></html>

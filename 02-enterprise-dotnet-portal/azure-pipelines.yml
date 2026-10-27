@@ -1,25 +1,33 @@
 trigger: [main]
-pool: { vmImage: windows-latest }
+pool: { vmImage: ubuntu-latest }
 variables: { buildConfiguration: Release }
 stages:
-- stage: Build
+- stage: BuildAndTest
   jobs:
-  - job: BuildAndTest
+  - job: Build
     steps:
     - task: DotNetCoreCLI@2
-      inputs: { command: build, projects: '**/*.csproj', arguments: '--configuration $(buildConfiguration)' }
+      displayName: Restore + build solution
+      inputs: { command: build, projects: 'src/**/*.csproj', arguments: '--configuration $(buildConfiguration)' }
     - task: DotNetCoreCLI@2
-      inputs: { command: test, projects: '**/*Tests.csproj' }
+      displayName: Run tests
+      inputs: { command: test, projects: 'src/EnterprisePortal.Tests/*.csproj', arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage"' }
+    - task: PublishCodeCoverageResults@2
+      inputs: { codeCoverageTool: Cobertura, summaryFileLocation: '**/coverage.cobertura.xml' }
     - task: DotNetCoreCLI@2
-      inputs: { command: publish, arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)' }
+      displayName: Publish web
+      inputs: { command: publish, projects: 'src/EnterprisePortal.Web/*.csproj', arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)' }
     - publish: $(Build.ArtifactStagingDirectory)
       artifact: portal
-- stage: Deploy
-  dependsOn: Build
+- stage: DeployStaging
+  dependsOn: BuildAndTest
+  condition: succeeded()
   jobs:
-  - deployment: DeployStaging
+  - deployment: Deploy
     environment: staging
     strategy:
       runOnce:
         deploy:
-          steps: [ { task: AzureWebApp@1, inputs: { package: '$(Pipeline.Workspace)/portal' } } ]
+          steps:
+          - task: AzureWebApp@1
+            inputs: { package: '$(Pipeline.Workspace)/portal', appName: 'enterprise-portal-staging' }

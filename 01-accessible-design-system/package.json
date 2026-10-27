@@ -1,0 +1,11 @@
+{
+  "name": "enterprise-design-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "sass scss/main.scss css/main.css --no-source-map",
+    "check:a11y": "node scripts/check-a11y.js",
+    "start": "python3 -m http.server 8001"
+  },
+  "devDependencies": { "sass": "^1.77.0" }
+}

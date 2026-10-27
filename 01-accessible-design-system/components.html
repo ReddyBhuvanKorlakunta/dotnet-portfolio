@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Enterprise Design System</title><link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/components.css"></head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header"><div class="container"><p class="eyebrow">Component library</p>
+<h1>Components, with behaviour — not screenshots</h1>
+<p class="lede">Every component below works with a keyboard and a screen reader. Open this page, unplug the mouse, and try it. That is the test a senior reviewer will run.</p>
+<p><a href="index.html">Back to tokens and system</a></p></div></header>
+<main id="main" class="container">
+  <section aria-labelledby="tabs-h"><h2 id="tabs-h">Tabs (ARIA tabs pattern)</h2>
+  <div role="tablist" aria-label="Case views">
+    <button role="tab" id="tab-1" aria-selected="true" aria-controls="panel-1">Open cases</button>
+    <button role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2" tabindex="-1">Closed cases</button>
+  </div>
+  <div role="tabpanel" id="panel-1" aria-labelledby="tab-1"><p>14 open cases (dummy data).</p></div>
+  <div role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden><p>9 closed cases (dummy data).</p></div>
+  </section>
+  <section aria-labelledby="dialog-h"><h2 id="dialog-h">Dialog (focus trapped, Escape closes)</h2>
+  <button class="btn btn--primary" type="button" id="open-dialog">Confirm an action</button>
+  <dialog id="confirm-dialog" aria-labelledby="dialog-title">
+    <h2 id="dialog-title">Confirm case closure</h2>
+    <p>Closing a case cannot be undone from this demo. In production this calls <code>PATCH /api/v1/cases/{id}/status</code> with status Closed.</p>
+    <form method="dialog"><button class="btn btn--primary" value="close">Close case</button> <button class="btn btn--secondary" value="cancel">Cancel</button></form>
+  </dialog><p id="dialog-out" role="status" aria-live="polite"></p>
+  </section>
+  <section aria-labelledby="table-h"><h2 id="table-h">Sortable table</h2>
+  <p>Click a header to sort. Sorting is announced with <code>aria-sort</code> — a screen reader must know the order changed.</p>
+  <table id="sortable"><caption>Dummy cases</caption>
+  <thead><tr><th scope="col" aria-sort="none"><button type="button" data-sort="ref">Reference</button></th><th scope="col" aria-sort="none"><button type="button" data-sort="title">Title</button></th><th scope="col">Status</th></tr></thead>
+  <tbody><tr><td>CA-1043</td><td>Document check</td><td>In review</td></tr><tr><td>CA-1042</td><td>Benefits review</td><td>Approved</td></tr></tbody></table>
+  </section>
+  <section aria-labelledby="alert-h"><h2 id="alert-h">Alert (not colour-only)</h2>
+  <div class="alert alert--error" role="alert"><strong>Error:</strong> The form could not be submitted. Check the highlighted fields — the message is text, not just red.</div>
+  </section>
+</main>
+<script src="js/components.js"></script>
+</body></html>
