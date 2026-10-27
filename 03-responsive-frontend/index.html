@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsive Front-End — Public Services Dashboard Demo</title>
+<meta name="description" content="Responsive HTML5 / Sass / JavaScript demo: dashboard, cards, interactive form, mobile navigation.">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="header">
+  <div class="container header-inner">
+    <p class="logo">Public Services <span>Demo</span></p>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" id="nav-toggle">Menu</button>
+    <nav id="nav" aria-label="Main"><a href="#services">Services</a><a href="#dashboard">Dashboard</a><a href="#apply">Apply</a></nav>
+  </div>
+</header>
+<main id="main" class="container">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">HTML5 · Sass · JavaScript · Responsive</p>
+      <h1>Check a case, in plain language, on any device</h1>
+      <p class="lede">Designed mobile-first: one column on a phone, three on a desktop,
+      same content, same order, no hidden steps. That is the UX decision here —
+      not a separate mobile site.</p>
+      <a class="btn" href="#apply">Start a dummy application</a>
+    </div>
+    <div class="hero-card" aria-hidden="true"><p>CA-1042</p><p><strong>Approved</strong></p><p>$0 — dummy data</p></div>
+  </section>
+
+  <section id="services" aria-labelledby="svc-h">
+    <h2 id="svc-h">Services</h2>
+    <div class="grid">
+      <article class="card"><h3>Benefits review</h3><p>What you need, what happens next, and how long it takes — in that order.</p></article>
+      <article class="card"><h3>Document check</h3><p>Upload, review, and a clear yes/no — no jargon, no dead ends.</p></article>
+      <article class="card"><h3>Case tracking</h3><p>One status line, one next step. Status is text, never colour alone.</p></article>
+    </div>
+  </section>
+
+  <section id="dashboard" aria-labelledby="dash-h">
+    <h2 id="dash-h">Dashboard (dummy data)</h2>
+    <div class="stats" role="list">
+      <div role="listitem"><strong id="stat-a">—</strong><span>Cases in review</span></div>
+      <div role="listitem"><strong id="stat-b">—</strong><span>Approved this week</span></div>
+      <div role="listitem"><strong id="stat-c">—</strong><span>Average wait</span></div>
+    </div>
+    <p><button class="btn btn--secondary" type="button" id="refresh">Refresh dummy stats</button></p>
+  </section>
+
+  <section id="apply" aria-labelledby="apply-h">
+    <h2 id="apply-h">Apply — step pattern</h2>
+    <p>Progress is shown as steps, the current step is marked with
+    <code>aria-current="step"</code>, and completed steps stay reachable — users
+    can go back without losing data.</p>
+    <ol class="steps"><li aria-current="step">Your details</li><li>Documents</li><li>Review</li></ol>
+    <form id="apply-form" novalidate>
+      <label for="a-name">Full name</label>
+      <input id="a-name" type="text" autocomplete="name" required>
+      <p class="err" id="a-err" role="alert"></p>
+      <button class="btn" type="submit">Continue (demo only)</button>
+      <p id="a-out" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</main>
+<footer class="container"><p>Dummy data only. See <code>docs/ux-notes.md</code> for layout, interaction and designer-collaboration notes.</p></footer>
+<script src="js/main.js"></script>
+</body>
+</html>

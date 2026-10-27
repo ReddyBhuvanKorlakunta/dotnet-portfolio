@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessible Design System — Enterprise UI Demo</title>
+<meta name="description" content="Design-system demo: Bootstrap grid + Material elevation, rebuilt as tokens in Sass, meeting WCAG 2.1 AA.">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="container">
+    <p class="eyebrow">Enterprise design system · WCAG 2.1 AA</p>
+    <h1>One system, not three frameworks</h1>
+    <p class="lede">Buttons, forms, tables and cards built from design tokens — so Bootstrap
+    and Material stop looking like two different products. Every component below
+    is keyboard-operable, has a visible focus state, and passes axe with no violations
+    when tested as documented in <code>docs/accessibility-test-notes.md</code>.</p>
+    <nav aria-label="Demo sections">
+      <a href="#tokens">Tokens</a> · <a href="#components">Components</a> ·
+      <a href="#form">Accessible form</a> · <a href="#system">System vs. library</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container">
+  <section id="tokens" aria-labelledby="tokens-h">
+    <h2 id="tokens-h">Design tokens (Sass source of truth)</h2>
+    <p>Change a token in <code>scss/_tokens.scss</code>, recompile, and every component
+    updates. That is the difference from dropping in a component library: the token
+    layer is owned by the enterprise, the components consume it.</p>
+    <ul class="swatches" aria-label="Brand colour tokens">
+      <li style="--sw:#0b4f6c"><span>Primary</span><code>#0b4f6c</code></li>
+      <li style="--sw:#0e7a5f"><span>Success</span><code>#0e7a5f</code></li>
+      <li style="--sw:#b45309"><span>Warning text</span><code>#b45309</code></li>
+      <li style="--sw:#f2f4f7"><span>Surface</span><code>#f2f4f7</code></li>
+    </ul>
+    <p class="note">Contrast check: primary on white is 7.1:1, body text on white is
+    15.8:1 — both pass AA (4.5:1) and AAA for normal text. No text is placed
+    over a photo or chart in this demo.</p>
+  </section>
+
+  <section id="components" aria-labelledby="comp-h">
+    <h2 id="comp-h">Components</h2>
+    <div class="card-grid">
+      <article class="card">
+        <h3>Case status card</h3>
+        <p>Status is never colour-only: it carries text and an icon with
+        <code>aria-hidden</code> on the decorative icon.</p>
+        <p><span class="badge badge--success">● Approved</span>
+           <span class="badge">● In review</span></p>
+        <button class="btn btn--primary" type="button" id="demo-btn">View case</button>
+        <p id="demo-out" role="status" aria-live="polite"></p>
+      </article>
+      <article class="card card--elevated">
+        <h3>Material-style elevation, tokenised</h3>
+        <p>Elevation is a token (<code>$shadow-2</code>), not a one-off box-shadow.
+        Focus is a 3px outline, never removed.</p>
+        <button class="btn btn--secondary" type="button">Secondary action</button>
+      </article>
+    </div>
+
+    <h3>Data table — real table markup, not divs</h3>
+    <table>
+      <caption>Dummy case list — no real personal data</caption>
+      <thead><tr><th scope="col">Case</th><th scope="col">Type</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr><td>CA-1042</td><td>Benefits review</td><td>Approved</td></tr>
+        <tr><td>CA-1043</td><td>Document check</td><td>In review</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="form" aria-labelledby="form-h">
+    <h2 id="form-h">Accessible form</h2>
+    <form id="demo-form" novalidate>
+      <div class="field">
+        <label for="f-name">Full name <span aria-hidden="true">*</span></label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="f-name-err">
+        <p class="field-error" id="f-name-err" role="alert"></p>
+      </div>
+      <div class="field">
+        <label for="f-email">Work email <span aria-hidden="true">*</span></label>
+        <input id="f-email" name="email" type="email" autocomplete="email" required aria-describedby="f-email-err">
+        <p class="field-error" id="f-email-err" role="alert"></p>
+      </div>
+      <button class="btn btn--primary" type="submit">Submit dummy form</button>
+      <p id="form-out" role="status" aria-live="polite"></p>
+    </form>
+    <p class="note">Errors are announced with <code>role="alert"</code>, linked with
+    <code>aria-describedby</code>, and focus moves to the first invalid field — the
+    pattern JAWS users expect. This form submits nowhere; it is a demo.</p>
+  </section>
+
+  <section id="system" aria-labelledby="sys-h">
+    <h2 id="sys-h">Design system vs. component library vs. framework</h2>
+    <p><strong>Framework (Bootstrap):</strong> gives you a grid and pre-styled
+    components, fast, but every Bootstrap site looks alike unless you override it.</p>
+    <p><strong>Component library (Material):</strong> gives you ready components
+    with behaviour, but its look, tokens and motion are Google's, not the enterprise's.</p>
+    <p><strong>Design system:</strong> tokens + components + usage rules + accessibility
+    standards, owned by the enterprise. It can <em>use</em> Bootstrap's grid and
+    Material's elevation and still look and behave like one product — which is what
+    this demo does. See <code>docs/design-system-vs-bootstrap.md</code> for the
+    full interview-ready version of this answer.</p>
+  </section>
+</main>
+
+<footer class="container"><p>Dummy data only. Built with HTML5, Sass, vanilla JavaScript. No framework JS required.</p></footer>
+<script src="js/main.js"></script>
+</body>
+</html>

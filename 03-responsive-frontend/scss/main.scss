@@ -1,0 +1,32 @@
+// Sass source — compiled output is css/main.css. sass scss/main.scss css/main.css
+$primary: #0b4f6c; $text: #1a1d21; $surface: #f2f4f7; $border: #cbd5e1; $radius: 10px;
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: $text; line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 0 1rem; }
+.skip-link { position: absolute; left: -9999px; background: $primary; color: #fff; padding: .5rem 1rem; }
+.skip-link:focus { left: 1rem; top: 1rem; }
+:focus-visible { outline: 3px solid $primary; outline-offset: 3px; }
+.header { background: $primary; color: #fff; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.header a { color: #fff; margin-left: 1rem; }
+.nav-toggle { display: none; }
+.hero { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding: 2rem 0; align-items: center; }
+.hero-card { background: $surface; border: 1px solid $border; border-radius: $radius; padding: 1.5rem; text-align: center; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.card { border: 1px solid $border; border-radius: $radius; padding: 1rem; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+.stats > div { background: $surface; padding: 1rem; border-radius: $radius; }
+.stats strong { display: block; font-size: 2rem; }
+.btn { display: inline-block; background: $primary; color: #fff; padding: .6rem 1.2rem; border-radius: $radius; border: 2px solid $primary; text-decoration: none; font: inherit; cursor: pointer; }
+.btn--secondary { background: #fff; color: $primary; }
+.steps { display: flex; gap: 1rem; list-style: none; padding: 0; }
+.steps li[aria-current="step"] { font-weight: 700; border-bottom: 3px solid $primary; }
+input { display: block; width: 100%; max-width: 420px; padding: .6rem; border: 2px solid $border; border-radius: $radius; font: inherit; margin: .5rem 0; }
+.err { color: #9b1c1c; }
+@media (max-width: 700px) {
+  .hero, .grid, .stats { grid-template-columns: 1fr; }
+  .nav-toggle { display: block; background: #fff; color: $primary; border: 0; padding: .5rem 1rem; border-radius: 6px; }
+  #nav { display: none; flex-direction: column; }
+  #nav.open { display: flex; }
+  .header-inner { flex-wrap: wrap; }
+}

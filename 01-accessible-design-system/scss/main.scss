@@ -1,0 +1,30 @@
+@use "tokens" as *;
+* { box-sizing: border-box; }
+body { margin: 0; font-family: $font-base; color: $color-text; line-height: 1.6; font-size: 1.05rem; }
+.container { max-width: 900px; margin: 0 auto; padding: 0 $space; }
+.skip-link { position: absolute; left: -9999px; background: $color-primary; color: #fff; padding: .5rem 1rem; }
+.skip-link:focus { left: $space; top: $space; }
+:focus-visible { outline: 3px solid $color-primary; outline-offset: 3px; }
+.site-header { background: $color-surface; border-bottom: 4px solid $color-primary; padding: 2rem 0 1.5rem; }
+.eyebrow { text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; color: $color-primary; font-weight: 700; }
+.lede { max-width: 68ch; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: $space; }
+.card { border: 1px solid $color-border; border-radius: $radius; padding: $space; }
+.card--elevated { box-shadow: $shadow-2; }
+.btn { font: inherit; padding: .6rem 1.2rem; border-radius: $radius; cursor: pointer; border: 2px solid $color-primary; }
+.btn--primary { background: $color-primary; color: #fff; }
+.btn--primary:hover { background: $color-primary-dark; }
+.btn--secondary { background: #fff; color: $color-primary; }
+.badge { display: inline-block; border: 1px solid $color-border; border-radius: 999px; padding: .15rem .7rem; }
+.badge--success { border-color: $color-success; color: $color-success; font-weight: 700; }
+.swatches { display: flex; flex-wrap: wrap; gap: $space; list-style: none; padding: 0; }
+.swatches li { border: 1px solid $color-border; border-radius: $radius; padding: $space; }
+.swatches li::before { content: ""; display: block; height: 48px; background: var(--sw); border-radius: 4px; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { text-align: left; padding: .6rem; border-bottom: 1px solid $color-border; }
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-weight: 700; }
+.field input { width: 100%; max-width: 420px; padding: .6rem; border: 2px solid $color-border; border-radius: $radius; font: inherit; }
+.field-error { color: #9b1c1c; min-height: 1.2em; }
+.note { background: $color-surface; border-left: 4px solid $color-primary; padding: .75rem 1rem; }
+@media (max-width: 600px) { body { font-size: 1rem; } .card-grid { grid-template-columns: 1fr; } }

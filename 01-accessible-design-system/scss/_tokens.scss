@@ -1,0 +1,13 @@
+// Design tokens — the single source of truth. Compiled output is css/main.css.
+// To recompile with Dart Sass: sass scss/main.scss css/main.css
+$color-primary: #0b4f6c;
+$color-primary-dark: #083a50;
+$color-success: #0e7a5f;
+$color-warning-text: #b45309;
+$color-text: #1a1d21;
+$color-surface: #f2f4f7;
+$color-border: #cbd5e1;
+$radius: 8px;
+$shadow-2: 0 4px 16px rgba(11, 79, 108, .16);
+$space: 1rem;
+$font-base: system-ui, -apple-system, "Segoe UI", sans-serif;
