@@ -39,7 +39,6 @@ write.
 
 ## Repos on GitHub
 
-Existing account checked 2026-10-27: `@ReddyBhuvanKorlakunta` (5 public repos,
-no portfolio repo yet). This scaffold is intended as a new repo, e.g.
-`dotnet-accessible-portfolio` — confirm the name / public vs private before
-pushing, because a public repo is what a vendor can actually open.
+Live at https://github.com/ReddyBhuvanKorlakunta/dotnet-portfolio (public,
+pushed 2026-10-27). A public repo is what a vendor can actually open — do
+not submit a private repo link without inviting the reviewer.
