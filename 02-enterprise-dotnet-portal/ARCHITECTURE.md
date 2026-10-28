@@ -22,7 +22,7 @@
 ## Decisions (ADRs, short form)
 - **Clean Architecture, not a single project.** Controllers stay thin so
   business rules are testable without HTTP or SQL. The cost is more projects;
-  the payoff is that a reviewer can test a rule in seconds.
+  the payoff is that a developer can test a rule in seconds.
 - **State machine in the domain, not in the controller.** An illegal
   transition is an exception in `Case`, covered by `CaseDomainTests`, not a
   string comparison scattered across endpoints.

@@ -8,7 +8,7 @@ python3 -m http.server 8002
 # in the browser console before load, or serve behind the same origin in production.
 ```
 
-## What a reviewer should check
+## How to verify it
 - Filter + search actually filter (js/main.js, js/api.js) — not hard-coded cards.
 - Mobile menu, step form, and dashboard all work at 360px and 1440px.
 - Errors are announced, focus moves, status is text + colour.

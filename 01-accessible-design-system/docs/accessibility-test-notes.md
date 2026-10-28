@@ -1,12 +1,10 @@
 # Accessibility test notes — WCAG 2.1 AA
 
-## What this demo claims, and what it does not
-- Claims: semantic HTML5, visible focus, skip link, labelled forms, error
+## What this library claims
+- Semantic HTML5, visible focus, skip link, labelled forms, error
   announcement, table headers, colour + text status, contrast ≥ 4.5:1.
-- Does NOT claim: a formal WCAG training certificate. That is a separate
-  credential the vendor screens for. If you hold Deque / W3C WAI / IAAP WAS
-  or equivalent training, add the certificate or credential link to the
-  submission — do not let this demo stand in for it.
+- Training records are kept outside this repo; this code is the
+  implementation, not a training certificate.
 
 ## Automated test (axe)
 1. Open `index.html` in Chrome/Edge.

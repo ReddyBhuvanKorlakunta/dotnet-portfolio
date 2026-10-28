@@ -19,7 +19,7 @@ designer, flag any colour pair below 4.5:1 before building, prototype the
 form error state (not just the happy path), and agree the mobile breakpoint
 from content — when the layout breaks — not from a device list.
 
-## What to say in interview
-"I translate designs into production pages, but I push back where a design
+## Design decisions
+"Translate designs into production pages, and push back where a design
 breaks accessibility or mobile usability — with a working alternative, not
 just a no."

@@ -15,7 +15,7 @@ namespace LegacyPortal
         protected void btnRefresh_Click(object sender, EventArgs e) => LoadCase();
         private void LoadCase()
         {
-            // Dummy data in the portfolio; production reads via a parameterised
+            // Sample data in this system; production reads via a parameterised
             // query / repository, never string-built SQL.
             lblReference.Text = "CA-1042";
             lblStatus.Text = "In review";

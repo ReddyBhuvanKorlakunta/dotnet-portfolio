@@ -1,7 +1,7 @@
 namespace EnterprisePortal.Domain.Entities;
 /// <summary>Case aggregate. Status changes go through methods, never direct
 /// assignment, so illegal transitions are impossible to express in code and
-/// are caught by unit tests, not by a reviewer reading a controller.</summary>
+/// are caught by unit tests, not by reading a controller.</summary>
 public class Case : Entity
 {
     private static readonly Dictionary<CaseStatus, CaseStatus[]> Allowed = new()

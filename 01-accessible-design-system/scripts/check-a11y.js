@@ -1,5 +1,5 @@
 // Static accessibility lint — NOT a replacement for axe or a screen-reader test.
-// Fails the build on the defects a reviewer actually finds first:
+// Fails the build on the defects found first in manual testing:
 // missing lang, missing skip link, unlabelled inputs, images without alt,
 // buttons with no accessible name, colour-only status.
 // Run: npm run check:a11y   Full check: axe DevTools + JAWS script in docs/

@@ -6,6 +6,6 @@
 4. Migrate a page only when it needs a functional change — never a big-bang rewrite.
 5. Delete the Web Forms page only after its traffic is zero and its tests pass on the new path.
 
-Interview point: Web Forms = page lifecycle + ViewState + server controls.
+Note: Web Forms = page lifecycle + ViewState + server controls.
 MVC = routing + controllers + separation of concerns. Knowing both, and
 knowing when *not* to rewrite, is the enterprise skill — not just knowing MVC.

@@ -10,6 +10,6 @@
   on MVC forms, CSP / nosniff / frame-deny headers.
 - Classified / sensitive data: this repo contains dummy data only. Real
   handling follows the owning agency's rules, which are not demonstrated
-  here with real data and must never be carried in a portfolio repo.
+  here with real data and must never be carried in this repo.
 - Reporting: if you find a real vulnerability in this demo code, do not
   open a public issue with exploit details — contact the repo owner first.

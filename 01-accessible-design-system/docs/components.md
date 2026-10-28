@@ -1,7 +1,7 @@
 # Component library — usage rules
 
 Every component ships with: markup, Sass, JS behaviour, keyboard pattern,
-screen-reader expectations, and a do / don't.
+assistive-technology expectations, and a do / don't.
 
 | Component | Keyboard | Screen reader |
 |---|---|---|

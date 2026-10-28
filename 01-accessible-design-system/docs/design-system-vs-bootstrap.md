@@ -1,4 +1,4 @@
-# Design system vs. component library vs. framework — interview answer
+# Design system vs. component library vs. framework
 
 **Framework — Bootstrap:** a grid, utilities and pre-styled components.
 Fast to start, but without overrides every site looks like Bootstrap, and
@@ -6,7 +6,7 @@ upgrades can break custom overrides.
 
 **Component library — Material:** ready components with behaviour (menus,
 dialogs, elevation). Strong consistency, but the visual language is the
-vendor's, and accessibility behaviour is only as good as your implementation
+library author's, and accessibility behaviour is only as good as your implementation
 of it.
 
 **Design system:** tokens (colour, spacing, type, elevation) + components

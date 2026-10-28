@@ -53,13 +53,3 @@ dotnet test src/EnterprisePortal.Tests
 # Service: create encrypts notes, illegal status change is rejected (not crashed)
 # Security: AES-GCM roundtrip, tampered cipher fails
 ```
-
-## What changed from the first scaffold, and why
-The first version was a single project with a controller, a DbContext and a
-demo encryption class. A senior reviewer would filter that: no layering, no
-tests, no auth, no migrations, no deployment story. This version is the
-opposite trade — more files, but every file earns its place: a rule is either
-in the domain (testable), in the application service (testable), or it is
-infrastructure (swappable). If you disagree with a choice, the ADR section in
-ARCHITECTURE.md says why it was made, so you can argue with it in interview
-instead of defending a mystery.
