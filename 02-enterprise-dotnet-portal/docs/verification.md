@@ -15,8 +15,8 @@ Executed locally on October 28, 2026 using .NET SDK 10.0.403 and headless Chrome
 | Unauthenticated API | 401 |
 | Missing CSRF token | 400 |
 | Auditor create route | 403 |
-| SQL Server live database | Pending Windows CI/local SQL instance |
-| Web Forms build/runtime | Windows CI build configured; IIS runtime pending |
+| SQL Server live database | Passed on Windows CI: transactional create, durable read and transactional update |
+| Web Forms build/runtime | Build passed on Windows CI with zero warnings/errors; IIS runtime pending |
 | JAWS | Not performed; Windows required |
 | Full manual WCAG 2.1 AA assessment | Pending |
 | Formal WCAG training | Not established by this project |
@@ -28,3 +28,9 @@ Use Windows Chrome with JAWS. Record OS, browser, JAWS version, tester, date, ro
 
 ## Training evidence
 Complete formal accessibility training acceptable to the employer. Record provider, course, dates, certificate and practical exercises. This portfolio cannot create a training credential or substitute for real hands-on JAWS proficiency.
+
+## CI evidence
+The Linux portal job and Windows Web Forms/SQL Server job both passed for code commit `d8de1985ba1864c34267fe5bb6c842d2152bb3ca`.
+Run: https://github.com/ReddyBhuvanKorlakunta/dotnet-portfolio/actions/runs/40723323461
+The Windows job executed the same 17 core checks plus three SQL Server persistence checks. The Linux job executed the browser and axe suite. Subsequent documentation-only recording does not change the tested source.
+
