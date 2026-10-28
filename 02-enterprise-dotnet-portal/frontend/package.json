@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "sass --style=expanded --no-source-map scss/site.scss ../src/EnterprisePortal.Web/wwwroot/css/site.css && sass --load-path=node_modules --silence-deprecation=import,global-builtin,color-functions --no-source-map scss/framework-adapters.scss ../src/EnterprisePortal.Web/wwwroot/css/frameworks.css && esbuild framework-components.js --bundle --minify --format=esm --outfile=../src/EnterprisePortal.Web/wwwroot/js/framework-components.js",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "@material/web": "2.4.1",
+    "@playwright/test": "1.56.1",
+    "bootstrap": "5.3.8",
+    "esbuild": "0.25.12",
+    "sass": "1.93.2"
+  }
+}

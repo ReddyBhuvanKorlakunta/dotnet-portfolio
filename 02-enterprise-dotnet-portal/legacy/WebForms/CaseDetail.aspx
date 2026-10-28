@@ -1,13 +1,2 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CaseDetail.aspx.cs" Inherits="LegacyPortal.CaseDetail" %>
-<!doctype html>
-<html lang="en"><head><title>Case detail — legacy Web Forms</title></head>
-<body>
-<form id="form1" runat="server">
-  <h1>Case detail (Web Forms — still in the environment)</h1>
-  <p>Reference: <asp:Label ID="lblReference" runat="server" /></p>
-  <p>Status: <asp:Label ID="lblStatus" runat="server" /></p>
-  <asp:Button ID="btnRefresh" runat="server" Text="Refresh" OnClick="btnRefresh_Click" />
-  <p><small>Migration note: this page stays working as-is. New pages go to MVC;
-  this page migrates only when it needs a change, page by page — no big-bang rewrite.</small></p>
-</form>
-</body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Legacy case review · Civic Services</title></head><body><a href="#main">Skip to main content</a><main id="main"><h1>Legacy case review</h1><p>Synthetic records for the Windows Web Forms demonstration.</p><form id="form1" runat="server"><asp:Label ID="filterLabel" runat="server" AssociatedControlID="statusFilter" Text="Status"/><asp:DropDownList ID="statusFilter" runat="server"><asp:ListItem Value="">All statuses</asp:ListItem><asp:ListItem>Submitted</asp:ListItem><asp:ListItem>InReview</asp:ListItem></asp:DropDownList><asp:Button ID="btnRefresh" runat="server" Text="Filter cases" OnClick="btnRefresh_Click"/><asp:GridView ID="casesGrid" runat="server" AutoGenerateColumns="false" UseAccessibleHeader="true" Caption="Synthetic assistance cases"><Columns><asp:BoundField DataField="Reference" HeaderText="Reference" HtmlEncode="true"/><asp:BoundField DataField="Title" HeaderText="Title" HtmlEncode="true"/><asp:BoundField DataField="Status" HeaderText="Status" HtmlEncode="true"/></Columns><EmptyDataTemplate>No matching cases.</EmptyDataTemplate></asp:GridView><asp:Label ID="resultCount" runat="server" role="status"/></form></main></body></html>

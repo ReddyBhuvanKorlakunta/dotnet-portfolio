@@ -1,19 +1,7 @@
-@using EnterprisePortal.Application.Common
-@model PagedResult<EnterprisePortal.Application.Cases.CaseListItem>
-<h1>Cases</h1>
-<form method="get" role="search">
-  <label for="search">Search</label>
-  <input id="search" name="Search" value="@Context.Request.Query["Search"]" type="search">
-  <button type="submit">Search</button>
-</form>
-<table>
-<thead><tr><th scope="col">Reference</th><th scope="col">Title</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col"></th></tr></thead>
-<tbody>
-@foreach (var c in Model.Items)
-{
-  <tr><td>@c.Reference</td><td>@c.Title</td><td>@c.Status</td><td>@c.CreatedAt.ToString("yyyy-MM-dd")</td>
-  <td><a asp-action="Details" asp-route-id="@c.Id">View</a></td></tr>
-}
-</tbody>
-</table>
-<p>Page @Model.Page of @Model.TotalPages — @Model.Total cases. API: <code>GET /api/v1/cases</code> (JWT, role: CaseWorker or Admin).</p>
+@model PagedResult<CaseListItem>
+@{ViewData["Title"]="Case workspace";}
+<div class="page-heading"><div><p class="eyebrow">COMMUNITY ASSISTANCE</p><h1>Case workspace</h1><p>Find a request, review the details, and take the next step.</p></div>@if(User.IsInRole("CaseWorker")){<a class="button" asp-action="Create">Create a case</a>}</div>
+<section class="panel"><h2>Find cases</h2><form method="get" class="filters"><div><label for="search">Title or reference</label><input id="search" name="search" value="@ViewData["Search"]" maxlength="200" type="search"></div><div><label for="status">Status</label><select id="status" name="status"><option value="">All statuses</option>@foreach(var s in Enum.GetValues<CaseStatus>()){<option value="@s" selected="@(ViewData["Status"]?.ToString()==s.ToString())">@s</option>}</select></div><div><label for="type">Request type</label><select id="type" name="type"><option value="">All types</option>@foreach(var t in Enum.GetValues<CaseType>()){<option value="@t" selected="@(ViewData["Type"]?.ToString()==t.ToString())">@t</option>}</select></div><button>Search cases</button><a asp-action="Index">Clear filters</a></form></section>
+<section class="panel"><div class="section-heading"><h2>Requests</h2><span>@Model.Total total results</span></div>
+@if(Model.Total==0){<div class="empty"><h3>No cases found</h3><p>Create your first case or adjust your search filters.</p></div>}else{<div class="table-scroll" role="region" aria-label="Case results" tabindex="0"><table><caption class="sr-only">Community assistance case search results</caption><thead><tr><th scope="col">Case</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Submitted</th></tr></thead><tbody>@foreach(var c in Model.Items){<tr><th scope="row"><a asp-action="Details" asp-route-id="@c.Id">@c.Title</a><small>@c.Reference</small></th><td>@c.Type</td><td><span class="badge">@c.Status</span></td><td>@c.Priority</td><td><time datetime="@c.CreatedAt.ToString("O")">@c.CreatedAt.ToString("MMM d, yyyy")</time></td></tr>}</tbody></table></div>
+<nav class="pagination" aria-label="Results pages"><p>Page @Model.Page of @Math.Max(1,Model.TotalPages)</p>@if(Model.Page>1){<a asp-action="Index" asp-route-page="@(Model.Page-1)" asp-route-search="@ViewData["Search"]" asp-route-status="@ViewData["Status"]" asp-route-type="@ViewData["Type"]">Previous page</a>}@if(Model.Page<Model.TotalPages){<a asp-action="Index" asp-route-page="@(Model.Page+1)" asp-route-search="@ViewData["Search"]" asp-route-status="@ViewData["Status"]" asp-route-type="@ViewData["Type"]">Next page</a>}</nav>}</section>

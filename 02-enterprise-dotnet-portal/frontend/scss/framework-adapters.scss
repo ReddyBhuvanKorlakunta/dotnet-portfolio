@@ -1,0 +1,3 @@
+@use "tokens" as t;
+@use "bootstrap/scss/bootstrap" with ($primary: t.$primary, $body-color: t.$ink, $body-bg: t.$canvas);
+:root { --md-sys-color-primary: #{t.$primary}; --md-sys-color-on-primary: #fff; --md-sys-color-surface: #fff; --md-sys-color-on-surface: #{t.$ink}; }

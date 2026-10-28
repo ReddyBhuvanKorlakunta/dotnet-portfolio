@@ -1,7 +1,5 @@
 namespace EnterprisePortal.Domain.Entities;
-/// <summary>Case aggregate. Status changes go through methods, never direct
-/// assignment, so illegal transitions are impossible to express in code and
-/// are caught by unit tests, not by reading a controller.</summary>
+
 public class Case : Entity
 {
     private static readonly Dictionary<CaseStatus, CaseStatus[]> Allowed = new()
@@ -33,12 +31,13 @@ public class Case : Entity
         Reference = reference; Title = title; Description = description; Type = type;
         ApplicantName = applicantName; ApplicantEmail = applicantEmail; CreatedBy = createdBy;
     }
+    public void SetPriority(CasePriority priority) { if (!Enum.IsDefined(priority)) throw new ArgumentException("Invalid priority."); Priority = priority; }
     public void Submit(string by) => Transition(CaseStatus.Submitted, by);
     public void StartReview(string by) => Transition(CaseStatus.InReview, by);
     public void Approve(string by) => Transition(CaseStatus.Approved, by);
     public void Reject(string by, string reason)
     {
-        if (string.IsNullWhiteSpace(reason)) throw new ArgumentException("Rejection reason is required.", nameof(reason));
+        if (string.IsNullOrWhiteSpace(reason)) throw new ArgumentException("Rejection reason is required.", nameof(reason));
         Transition(CaseStatus.Rejected, by); RejectionReason = reason;
     }
     public void Close(string by) => Transition(CaseStatus.Closed, by);

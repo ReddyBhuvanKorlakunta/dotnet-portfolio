@@ -1,4 +1,3 @@
-// Vanilla JS only — no framework needed for this demo.
 document.getElementById('demo-btn')?.addEventListener('click', () => {
   document.getElementById('demo-out').textContent = 'Case CA-1042 opened (demo — no data loaded).';
 });

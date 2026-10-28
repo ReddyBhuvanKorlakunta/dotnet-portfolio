@@ -1,74 +1,57 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 using EnterprisePortal.Application.Cases;
 using EnterprisePortal.Infrastructure.Data;
 using EnterprisePortal.Infrastructure.Security;
 using EnterprisePortal.Web.Auth;
 using EnterprisePortal.Web.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
-var env = builder.Environment;
-
-// --- Configuration, fail fast in Production if secrets are missing ---
-var conn = builder.Configuration.GetConnectionString("Default");
-var encKey = builder.Configuration["Encryption:Key"];
-var jwtKey = builder.Configuration["Jwt:Key"];
-if (env.IsProduction() && (string.IsNullOrWhiteSpace(conn) || string.IsNullOrWhiteSpace(encKey) || string.IsNullOrWhiteSpace(jwtKey)))
-    throw new InvalidOperationException("Production requires ConnectionStrings:Default, Encryption:Key and Jwt:Key (Key Vault). Refusing to start with dev defaults.");
-if (string.IsNullOrWhiteSpace(encKey)) encKey = "dev-only-change-me";
-if (string.IsNullOrWhiteSpace(jwtKey)) jwtKey = "dev-only-change-me-jwt-key-must-be-at-least-32-chars";
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(conn ?? "Server=(localdb)\mssqllocaldb;Database=EnterprisePortal;Trusted_Connection=True;"));
-builder.Services.AddScoped<ICaseRepository, CaseRepository>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddSingleton<IReferenceGenerator, ReferenceGenerator>();
-builder.Services.AddSingleton<IEncryptionService>(new EncryptionService(encKey));
-builder.Services.AddScoped<CaseService>();
-builder.Services.AddSingleton(new JwtSettings(jwtKey, builder.Configuration["Jwt:Issuer"] ?? "EnterprisePortal"));
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+var demo = builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Demo:Enabled");
+if (!demo && builder.Configuration["Storage:Provider"] != "SqlServer") throw new InvalidOperationException("Non-demo hosting requires SQL Server.");
+var key = builder.Configuration["Encryption:Key"];
+if (string.IsNullOrWhiteSpace(key)) throw new InvalidOperationException("Set Encryption__Key to a base64 encoded 32-byte random key.");
+var password = builder.Configuration["Auth:Password"];
+if (string.IsNullOrWhiteSpace(password) || password.Length < 14) throw new InvalidOperationException("Set Auth__Password to at least 14 characters.");
+if (!demo) throw new InvalidOperationException("Production release requires agency identity provider integration and security review. This portfolio host is demo-only.");
+builder.Services.AddSingleton(new DemoCredentials(password));
+builder.Services.AddSingleton<IEncryptionService>(new EncryptionService(key));
+builder.Services.AddSingleton<StoreGate>();
+builder.Services.AddScoped<ICaseStorage>(sp =>
 {
-    o.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ValidateIssuer = false, ValidateAudience = false, ClockSkew = TimeSpan.FromMinutes(2),
-    };
+#if SQLSERVER
+    if (builder.Configuration["Storage:Provider"] == "SqlServer") return new SqlServerStorage(builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("SQL connection required."), sp.GetRequiredService<IEncryptionService>());
+#endif
+    if (builder.Configuration["Storage:Provider"] == "SqlServer") throw new InvalidOperationException("Build with -p:UseSqlServer=true.");
+    return new DemoFileStorage(builder.Configuration["Demo:DataPath"] ?? "App_Data/cases.enc", sp.GetRequiredService<IEncryptionService>());
 });
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<CaseRepository>();
+builder.Services.AddScoped<ICaseRepository>(sp => sp.GetRequiredService<CaseRepository>());
+builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CaseRepository>());
+builder.Services.AddSingleton<IReferenceGenerator, ReferenceGenerator>();
+builder.Services.AddScoped<CaseService>();
+builder.Services.AddControllersWithViews(o => { o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); }).AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddAntiforgery(o => { o.HeaderName = "X-CSRF-TOKEN"; o.Cookie.SameSite = SameSiteMode.Strict; });
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
+{
+    o.LoginPath = "/Auth/Login"; o.AccessDeniedPath = "/Auth/Denied"; o.ExpireTimeSpan = TimeSpan.FromMinutes(20); o.SlidingExpiration = false;
+    o.Cookie.HttpOnly = true; o.Cookie.SameSite = SameSiteMode.Strict; o.Cookie.SecurePolicy = demo ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+    o.Events.OnRedirectToLogin = c => { if (c.Request.Path.StartsWithSegments("/api")) c.Response.StatusCode = 401; else c.Response.Redirect(c.RedirectUri); return Task.CompletedTask; };
+    o.Events.OnRedirectToAccessDenied = c => { c.Response.StatusCode = 403; return Task.CompletedTask; };
+});
+builder.Services.AddAuthorization(o => o.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+builder.Services.AddRateLimiter(o => { o.RejectionStatusCode = 429; o.AddFixedWindowLimiter("login", p => { p.PermitLimit = 10; p.Window = TimeSpan.FromMinutes(1); p.QueueLimit = 0; }); });
 var app = builder.Build();
+app.UseExceptionHandler("/Home/Error");
 app.UseMiddleware<RequestIdMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();
-if (!env.IsDevelopment()) app.UseExceptionHandler("/Home/Error");
-else app.UseDeveloperExceptionPage();
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapHealthChecks("/health");
+if (!demo) { app.UseHsts(); app.UseHttpsRedirection(); }
+app.UseStaticFiles(); app.UseRouting(); app.UseRateLimiter(); app.UseAuthentication(); app.UseAuthorization();
+app.MapGet("/health/live", () => Results.Ok(new { status = "live" })).AllowAnonymous();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
-app.MapControllers();
-// Seed dummy data only on explicit flag, never on a normal production start:
-//   dotnet run -- seed
-if (args.Contains("seed"))
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-    if (!await db.Cases.AnyAsync())
-    {
-        db.Cases.AddRange(SeedData.Cases());
-        await db.SaveChangesAsync();
-        Console.WriteLine("Seeded dummy cases.");
-    }
-    return;
-}
 app.Run();
-public partial class Program { } // for integration tests
+public partial class Program { }

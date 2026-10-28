@@ -1,7 +1,5 @@
-@model EnterprisePortal.Application.Cases.CaseDetail
-<h1>@Model.Title</h1>
-<dl><dt>Reference</dt><dd>@Model.Reference</dd><dt>Status</dt><dd>@Model.Status</dd><dt>Applicant</dt><dd>@Model.ApplicantName</dd></dl>
-<p>@Model.Description</p>
-<h2>Notes</h2>
-<ul>@foreach (var n in Model.Notes) { <li>@n</li> }</ul>
-<p><a href="/">Back to cases</a></p>
+@model CaseDetail
+@{ViewData["Title"]=Model.Title;var next=Model.Status switch {CaseStatus.Submitted=>new[]{CaseStatus.InReview,CaseStatus.Closed},CaseStatus.InReview=>new[]{CaseStatus.Approved,CaseStatus.Rejected,CaseStatus.Closed},CaseStatus.Rejected=>new[]{CaseStatus.Submitted,CaseStatus.Closed},CaseStatus.Approved=>new[]{CaseStatus.Closed},_=>Array.Empty<CaseStatus>()};}
+<a asp-action="Index">← Back to cases</a><p class="eyebrow">CASE @Model.Id</p><h1>@Model.Title</h1><p class="reference">@Model.Reference</p>
+<div class="detail-grid"><section class="panel"><h2>Request overview</h2><dl><dt>Status</dt><dd><span class="badge">@Model.Status</span></dd><dt>Request type</dt><dd>@Model.Type</dd><dt>Priority</dt><dd>@Model.Priority</dd><dt>Applicant</dt><dd>@Model.ApplicantName</dd><dt>Submitted</dt><dd>@Model.CreatedAt.ToString("MMMM d, yyyy HH:mm") UTC</dd></dl><h3>Description</h3><p class="prose">@(string.IsNullOrWhiteSpace(Model.Description)?"No description provided.":Model.Description)</p></section>
+@if(User.IsInRole("CaseWorker")&&next.Length>0){<section class="panel"><h2>Take the next step</h2><p>Review the request before recording a decision.</p><form asp-action="ChangeStatus" asp-route-id="@Model.Id" method="post"><div asp-validation-summary="All" class="error-summary" tabindex="-1"></div><label for="Status">New status</label><select id="Status" name="Status">@foreach(var s in next){<option value="@s">@s</option>}</select><label for="Reason">Decision reason</label><textarea id="Reason" name="Reason" maxlength="500" rows="4" aria-describedby="reason-help"></textarea><p id="reason-help" class="hint">Required when rejecting a case. Use fictional information.</p><button>Update status</button></form></section>}else{<section class="panel"><h2>@(Model.Status==CaseStatus.Closed?"Case closed":"Read-only access")</h2><p>@(Model.Status==CaseStatus.Closed?"This case has completed its workflow.":"An authorized caseworker can update this request.")</p></section>}</div>

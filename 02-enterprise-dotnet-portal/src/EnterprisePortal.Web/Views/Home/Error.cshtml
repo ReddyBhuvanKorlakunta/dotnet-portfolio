@@ -1,2 +1,2 @@
-<h1>Something went wrong</h1>
-<p>Please try again. If it continues, quote the X-Request-Id header from the response to support — it is in every log line.</p>
+@{ViewData["Title"]="Request could not be completed";}
+<h1>We could not complete your request</h1><p>Try again. If the problem continues, share this request identifier with support: <code>@Context.TraceIdentifier</code>.</p><a href="/">Return to cases</a>

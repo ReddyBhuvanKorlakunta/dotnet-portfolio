@@ -1,8 +1,8 @@
+using EnterprisePortal.Application.Common;
+using System.ComponentModel.DataAnnotations;
 using EnterprisePortal.Domain.Entities;
 namespace EnterprisePortal.Application.Cases;
-/// <summary>Application service: orchestration + validation, no SQL, no HTTP.
-/// Controllers are thin; all rules live here and in the domain, so they are
-/// unit-testable without a database or a web server.</summary>
+
 public class CaseService(ICaseRepository repo, IUnitOfWork uow, IEncryptionService crypto, IReferenceGenerator refs)
 {
     public async Task<PagedResult<CaseListItem>> ListAsync(CaseQuery q, CancellationToken ct = default)
@@ -18,7 +18,9 @@ public class CaseService(ICaseRepository repo, IUnitOfWork uow, IEncryptionServi
     }
     public async Task<Result<CaseDetail>> CreateAsync(CreateCaseRequest req, string user, CancellationToken ct = default)
     {
-        var c = new Case(refs.NextReference(), req.Title, req.Description, req.Type, req.ApplicantName, req.ApplicantEmail, user);
+        Validator.ValidateObject(req, new ValidationContext(req), true);
+        var c = new Case(refs.NextReference(), req.Title, req.Description ?? "", req.Type, req.ApplicantName, req.ApplicantEmail, user);
+        c.SetPriority(req.Priority);
         if (!string.IsNullOrWhiteSpace(req.Notes)) c.SetEncryptedNotes(crypto.Encrypt(req.Notes), user);
         c.Submit(user);
         await repo.AddAsync(c, ct);

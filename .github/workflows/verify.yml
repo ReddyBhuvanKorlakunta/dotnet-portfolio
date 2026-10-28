@@ -1,0 +1,51 @@
+name: Verify portfolio
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  portal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: dotnet build 02-enterprise-dotnet-portal/src/EnterprisePortal.sln -c Release -p:UseSqlServer=true
+      - run: dotnet 02-enterprise-dotnet-portal/src/EnterprisePortal.Tests/bin/Release/net10.0/EnterprisePortal.Tests.dll
+      - run: npm ci && npm run build && npx playwright install --with-deps chromium
+        working-directory: 02-enterprise-dotnet-portal/frontend
+      - name: Browser tests
+        shell: bash
+        run: |
+          export Auth__Password="$(openssl rand -base64 24)"
+          export Encryption__Key="$(openssl rand -base64 32)"
+          export PORTAL_TEST_PASSWORD="$Auth__Password"
+          export ASPNETCORE_ENVIRONMENT=Development
+          cd 02-enterprise-dotnet-portal/src/EnterprisePortal.Web
+          dotnet bin/Release/net10.0/EnterprisePortal.Web.dll --urls http://127.0.0.1:5080 > /tmp/portal.log 2>&1 &
+          cd ../../frontend
+          for i in {1..30}; do curl -fsS http://127.0.0.1:5080/health/live && break || sleep 1; done
+          npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-results
+          path: 02-enterprise-dotnet-portal/frontend/playwright-report
+  webforms:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - run: msbuild 02-enterprise-dotnet-portal/legacy/WebForms/LegacyPortal.csproj /p:Configuration=Release
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: SQL Server integration using LocalDB
+        shell: pwsh
+        run: |
+          sqllocaldb create PortfolioCI -s
+          $env:SQL_TEST_CONNECTION = "Server=(localdb)\PortfolioCI;Database=master;Integrated Security=true;Encrypt=false"
+          dotnet run --project 02-enterprise-dotnet-portal/src/EnterprisePortal.Tests -p:UseSqlServer=true

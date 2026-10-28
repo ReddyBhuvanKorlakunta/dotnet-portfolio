@@ -1,8 +1,4 @@
-# Production runbook
+# Operations demonstration
+Use the README commands. A healthy process responds 200 at `/health/live`; this is liveness, not database readiness. Keep the encryption key outside source control and back it up using an approved secret store. Never log request bodies, passwords, encryption keys, notes or applicant fields. Capture only request identifiers and operational error categories.
 
-- **Health:** `GET /health` — DB check included. If it fails, check logs before restarting.
-- **Logs:** correlate by `X-Request-Id` (every response, every log line).
-- **Bad deploy:** roll back to the previous Azure DevOps release. Do not hot-patch production.
-- **Database:** check the migration applied, then connection string / firewall. Never edit production data by hand without a ticket.
-- **Slow query:** check the SQL Server index on Status / CreatedAt, then the pagination cap (100/page), then the query plan — in that order.
-- **Concurrency error:** a second worker saved the same case first. Re-read, re-apply, re-save. Do not retry blindly.
+If the demo file cannot decrypt, restore its matching key rather than overwriting the data. Back up the encrypted snapshot and verify restore with synthetic records. File mode supports one process only. SQL mode requires its schema before startup and a trusted certificate. Production hosting is intentionally disabled.

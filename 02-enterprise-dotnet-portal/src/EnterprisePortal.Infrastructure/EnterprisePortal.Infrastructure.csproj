@@ -1,9 +1,1 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
-    <ProjectReference Include="..\EnterprisePortal.Domain\EnterprisePortal.Domain.csproj" />
-    <ProjectReference Include="..\EnterprisePortal.Application\EnterprisePortal.Application.csproj" />
-  </ItemGroup>
-</Project>
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup Condition="'$(UseSqlServer)' == 'true'"><DefineConstants>$(DefineConstants);SQLSERVER</DefineConstants></PropertyGroup><ItemGroup Condition="'$(UseSqlServer)' == 'true'"><PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" /><PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" /></ItemGroup><ItemGroup><ProjectReference Include="../EnterprisePortal.Domain/EnterprisePortal.Domain.csproj" /><ProjectReference Include="../EnterprisePortal.Application/EnterprisePortal.Application.csproj" /></ItemGroup></Project>
