@@ -1,0 +1,65 @@
+const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const password = process.env.PORTAL_TEST_PASSWORD;
+async function scan(page) {
+    const result = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();
+    expect(result.violations).toEqual([]);
+}
+async function login(page,email='worker@example.test') {
+    await page.goto('/Auth/Login');
+    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Password',{exact:true}).fill(password);
+    await page.getByRole('button',{name:'Sign in securely'}).click();
+    await expect(page).toHaveURL(/\/$/);
+}
+test('workflow, accessibility, API, CSRF and auditor permissions',async({page,context})=>{
+    expect(password).toBeTruthy();
+    await page.goto('/');
+    await expect(page).toHaveURL(/Auth\/Login/);
+    await scan(page);
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('link',{name:'Skip to main content'})).toBeFocused();
+    expect((await context.request.get('/api/v1/cases')).status()).toBe(401);
+    await login(page);
+    await scan(page);
+    expect((await context.request.post('/api/v1/cases',{data:{title:'No CSRF'}})).status()).toBe(400);
+    await page.getByRole('link',{name:'Create a case'}).click();
+    await scan(page);
+    await page.getByLabel('Case title').fill('Synthetic housing '+Date.now());
+    await page.getByLabel('Applicant name').fill('Alex Example');
+    await page.getByLabel('Applicant email').fill('alex@example.test');
+    await page.getByLabel('Restricted notes').fill('RESTRICTED_SYNTHETIC_TEST');
+    await page.getByLabel('Priority',{exact:true}).selectOption('2');
+    await page.getByRole('button',{name:'Submit case'}).click();
+    await expect(page).toHaveURL(/Details\/\d+/);
+    await expect(page.getByRole('status')).toContainText('submitted successfully');
+    await scan(page);
+    const detailUrl=page.url();
+    await page.getByLabel('New status').selectOption('InReview');
+    await page.getByRole('button',{name:'Update status'}).click();
+    await page.getByLabel('New status').selectOption('Rejected');
+    await page.getByRole('button',{name:'Update status'}).click();
+    await expect(page.locator('.validation-summary-errors')).toContainText('Rejection reason is required');
+    await expect(page.locator('.validation-summary-errors')).toBeFocused();
+    await scan(page);
+    await page.getByLabel('New status').selectOption('Approved');
+    await page.getByRole('button',{name:'Update status'}).click();
+    await expect(page.locator('.badge')).toHaveText('Approved');
+    await page.getByLabel('New status').selectOption('Closed');
+    await page.getByRole('button',{name:'Update status'}).click();
+    await expect(page.getByRole('heading',{name:'Case closed'})).toBeVisible();
+    const api=await context.request.get('/api/v1/cases');
+    expect(api.status()).toBe(200);
+    expect(await api.text()).not.toContain('RESTRICTED_SYNTHETIC_TEST');
+    await page.getByRole('link',{name:'Design system',exact:true}).click();
+    await scan(page);
+    await page.setViewportSize({width:375,height:812});
+    await page.goto('/');await scan(page);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+    await page.getByRole('button',{name:'Sign out'}).click();
+    await login(page,'auditor@example.test');
+    await expect(page.getByRole('link',{name:'Create a case'})).toHaveCount(0);
+    expect((await context.request.get('/Home/Create')).status()).toBe(403);
+    await page.goto(detailUrl);
+    await expect(page.getByRole('button',{name:'Update status'})).toHaveCount(0);
+});

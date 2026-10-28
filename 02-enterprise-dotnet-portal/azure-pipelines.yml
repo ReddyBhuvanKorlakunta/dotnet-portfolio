@@ -1,33 +1,11 @@
-trigger: [main]
-pool: { vmImage: ubuntu-latest }
-variables: { buildConfiguration: Release }
-stages:
-- stage: BuildAndTest
-  jobs:
-  - job: Build
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: Restore + build solution
-      inputs: { command: build, projects: 'src/**/*.csproj', arguments: '--configuration $(buildConfiguration)' }
-    - task: DotNetCoreCLI@2
-      displayName: Run tests
-      inputs: { command: test, projects: 'src/EnterprisePortal.Tests/*.csproj', arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage"' }
-    - task: PublishCodeCoverageResults@2
-      inputs: { codeCoverageTool: Cobertura, summaryFileLocation: '**/coverage.cobertura.xml' }
-    - task: DotNetCoreCLI@2
-      displayName: Publish web
-      inputs: { command: publish, projects: 'src/EnterprisePortal.Web/*.csproj', arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)' }
-    - publish: $(Build.ArtifactStagingDirectory)
-      artifact: portal
-- stage: DeployStaging
-  dependsOn: BuildAndTest
-  condition: succeeded()
-  jobs:
-  - deployment: Deploy
-    environment: staging
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureWebApp@1
-            inputs: { package: '$(Pipeline.Workspace)/portal', appName: 'enterprise-portal-staging' }
+trigger:
+  - main
+pool:
+  vmImage: ubuntu-latest
+steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: sdk
+      version: 10.0.x
+  - script: dotnet build 02-enterprise-dotnet-portal/src/EnterprisePortal.sln -c Release -p:UseSqlServer=true
+  - script: dotnet 02-enterprise-dotnet-portal/src/EnterprisePortal.Tests/bin/Release/net10.0/EnterprisePortal.Tests.dll

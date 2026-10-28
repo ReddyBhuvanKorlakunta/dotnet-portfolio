@@ -1,15 +1,8 @@
-# Security
+# Security boundaries
+Synthetic data only. This repository is a portfolio demonstration, not an approved classified system. No state-specific authorization, FIPS validation, CJIS, HIPAA or FedRAMP certification is claimed.
 
-- Secrets: never committed. Production secrets live in Azure Key Vault.
-  `appsettings.Development.json` contains dev-only keys and is labelled as such.
-- Sensitive fields: AES-GCM (confidentiality + integrity), never ECB, never
-  plain text, never in logs. Audit logs record who/what/when, never the value.
-- Auth: JWT bearer, role-based (`Admin`, `CaseWorker`). Anonymous API calls
-  get 401, unauthorised roles get 403 — never data.
-- Input: DataAnnotations validation, EF Core parameterisation, anti-forgery
-  on MVC forms, CSP / nosniff / frame-deny headers.
-- Classified / sensitive data: this repo contains dummy data only. Real
-  handling follows the owning agency's rules, which are not demonstrated
-  here with real data and must never be carried in this repo.
-- Reporting: if you find a real vulnerability in this demo code, do not
-  open a public issue with exploit details — contact the repo owner first.
+Implemented controls: authenticated MVC and API routes, role-restricted writes, CSRF checks, local return URL validation, PBKDF2 password verification, short-lived HttpOnly SameSite cookies, login rate limiting, encoded Razor output, CSP, frame blocking, content-type protection, bounded input and AES-GCM authenticated encryption with random nonces. Base64 keys must decode to 32 random bytes. No secrets are committed. Health liveness reveals no database details. Restricted notes are omitted from DTOs. Both file and SQL snapshots are encrypted. Transition history lives inside the encrypted snapshot and is not a tamper-resistant external audit log.
+
+Threats remaining: shared demo identities, no MFA/SSO, no record ownership isolation, no key versioning or automated rotation, no append-only audit sink, no operational alerting, single-snapshot scalability, session loss when host keys change and unverified agency requirements. Demo loopback HTTP must not be exposed to a network. Production startup is blocked. An agency must supply its actual data-classification, hosting, key-management, access, retention and incident-response requirements before production implementation.
+
+Report vulnerabilities privately through the repository owner's contact channel. Do not include personal information or secrets in public issues.

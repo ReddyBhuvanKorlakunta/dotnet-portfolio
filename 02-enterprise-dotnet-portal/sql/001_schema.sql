@@ -1,14 +1,10 @@
--- SQL Server — run in order. Dummy data only.
-CREATE TABLE dbo.Cases (
-  Id INT IDENTITY(1,1) PRIMARY KEY,
-  Reference NVARCHAR(50) NOT NULL,
-  Status NVARCHAR(50) NOT NULL,
-  EncryptedNotes NVARCHAR(MAX) NULL,
-  CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+IF OBJECT_ID('dbo.CaseStore','U') IS NULL
+CREATE TABLE dbo.CaseStore (
+    Id int NOT NULL CONSTRAINT PK_CaseStore PRIMARY KEY CONSTRAINT CK_CaseStore_Id CHECK(Id=1),
+    Payload nvarchar(max) NOT NULL,
+    UpdatedAt datetime2 NOT NULL CONSTRAINT DF_CaseStore_UpdatedAt DEFAULT SYSUTCDATETIME(),
+    Version rowversion NOT NULL
 );
-GO
-INSERT INTO dbo.Cases (Reference, Status) VALUES
-  ('CA-1042', 'Approved'), ('CA-1043', 'In review');
-GO
--- Read pattern used by the API: parameterised, least-privilege login only.
--- SELECT Id, Reference, Status, CreatedAt FROM dbo.Cases WHERE Status = @status;
+COMMIT;

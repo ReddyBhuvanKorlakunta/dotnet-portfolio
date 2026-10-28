@@ -1,4 +1,3 @@
-// Tabs: arrow keys move, roving tabindex, aria-selected kept in sync.
 const tabs = [...document.querySelectorAll('[role="tab"]')];
 tabs.forEach((tab, i) => {
   tab.addEventListener('click', () => selectTab(i));
@@ -15,14 +14,11 @@ function selectTab(i) {
     document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
   });
 }
-// Dialog: native <dialog> gives focus trapping and Escape for free —
-// do not hand-roll a modal with divs.
 const dialog = document.getElementById('confirm-dialog');
 document.getElementById('open-dialog')?.addEventListener('click', () => dialog.showModal());
 dialog?.addEventListener('close', () => {
   document.getElementById('dialog-out').textContent = dialog.returnValue === 'close' ? 'Case closed (demo).' : 'Cancelled.';
 });
-// Sortable table: sort by column, update aria-sort.
 document.querySelectorAll('#sortable th button').forEach((btn) => {
   btn.addEventListener('click', () => {
     const table = document.getElementById('sortable');

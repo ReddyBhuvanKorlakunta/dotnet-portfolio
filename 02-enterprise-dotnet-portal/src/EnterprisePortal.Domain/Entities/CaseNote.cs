@@ -1,4 +1,5 @@
 namespace EnterprisePortal.Domain.Entities;
+
 public class CaseNote : Entity
 {
     public int CaseId { get; private set; }

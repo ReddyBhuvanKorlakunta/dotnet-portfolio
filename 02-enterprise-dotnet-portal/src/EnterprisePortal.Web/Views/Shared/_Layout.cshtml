@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Enterprise Portal</title><link rel="stylesheet" href="~/css/site.css"></head>
-<body>
-<a class="skip-link" href="#main">Skip to main content</a>
-<header><nav aria-label="Main"><a href="/">Cases</a> <a href="/health">Health</a></nav></header>
-<main id="main">@RenderBody()</main>
-<footer><p>Dummy data only. See <a href="/docs">architecture notes in the repo</a>.</p></footer>
-@RenderSection("Scripts", required: false)
-</body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>@ViewData["Title"] · Civic Services</title>@await RenderSectionAsync("Styles", required: false)<link rel="stylesheet" href="~/css/site.css" asp-append-version="true"><script src="~/js/site.js" asp-append-version="true" defer></script></head>
+<body><a class="skip-link" href="#main">Skip to main content</a>
+<div class="banner">PORTFOLIO DEMONSTRATION <span>Fictional agency · Synthetic data only</span></div>
+<header><div class="brand"><span class="seal" aria-hidden="true">CS</span><div>Civic Services<small>Community assistance workspace</small></div></div>
+@if(User.Identity?.IsAuthenticated == true){<nav aria-label="Primary"><a asp-controller="Home" asp-action="Index">Cases</a><a asp-controller="Home" asp-action="DesignSystem">Design system</a><form asp-controller="Auth" asp-action="Logout" method="post"><button class="text-button">Sign out</button></form></nav>}
+</header>
+<main id="main" tabindex="-1">@if(TempData["Notice"] is string notice){<div class="notice" role="status">@notice</div>}@RenderBody()</main>
+<footer><p>Civic Services · .NET portfolio</p><p>For demonstration only. Do not enter real personal or sensitive information.</p></footer>
+@await RenderSectionAsync("Scripts", required: false)</body></html>

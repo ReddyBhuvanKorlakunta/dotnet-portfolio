@@ -6,3 +6,8 @@ appsettings.Production.json
 *.db
 node_modules/
 _site/
+App_Data/
+*.enc
+.env
+playwright-report/
+test-results/

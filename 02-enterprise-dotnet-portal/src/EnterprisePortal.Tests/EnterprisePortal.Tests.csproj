@@ -1,11 +1,1 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><IsPackable>false</IsPackable></PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="xunit" Version="2.7.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.7.0" />
-    <ProjectReference Include="..\EnterprisePortal.Domain\EnterprisePortal.Domain.csproj" />
-    <ProjectReference Include="..\EnterprisePortal.Application\EnterprisePortal.Application.csproj" />
-    <ProjectReference Include="..\EnterprisePortal.Infrastructure\EnterprisePortal.Infrastructure.csproj" />
-  </ItemGroup>
-</Project>
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType></PropertyGroup><PropertyGroup Condition="'$(UseSqlServer)' == 'true'"><DefineConstants>$(DefineConstants);SQLSERVER</DefineConstants></PropertyGroup><ItemGroup><ProjectReference Include="../EnterprisePortal.Domain/EnterprisePortal.Domain.csproj" /><ProjectReference Include="../EnterprisePortal.Application/EnterprisePortal.Application.csproj" /><ProjectReference Include="../EnterprisePortal.Infrastructure/EnterprisePortal.Infrastructure.csproj" /></ItemGroup></Project>

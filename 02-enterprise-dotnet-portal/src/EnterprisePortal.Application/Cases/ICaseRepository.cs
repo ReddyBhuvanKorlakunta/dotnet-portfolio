@@ -1,5 +1,6 @@
 using EnterprisePortal.Domain.Entities;
 namespace EnterprisePortal.Application.Cases;
+
 public interface ICaseRepository
 {
     Task<Case?> GetByIdAsync(int id, CancellationToken ct = default);

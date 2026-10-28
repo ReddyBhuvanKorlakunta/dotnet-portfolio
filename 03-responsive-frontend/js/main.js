@@ -35,7 +35,6 @@ document.getElementById('filter-form')?.addEventListener('submit', (e) => {
   load(params);
 });
 load();
-// Two-step apply form with draft in sessionStorage (dummy data only).
 const nameEl = document.getElementById('a-name'), titleEl = document.getElementById('a-title');
 const draft = JSON.parse(sessionStorage.getItem('apply-draft') || '{}');
 if (draft.name) nameEl.value = draft.name;

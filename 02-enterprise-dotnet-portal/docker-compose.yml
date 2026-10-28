@@ -1,15 +1,14 @@
 services:
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+  portal:
+    build:
+      context: ..
+      dockerfile: 02-enterprise-dotnet-portal/Dockerfile
+    ports: ["127.0.0.1:5080:8080"]
     environment:
-      SA_PASSWORD: "DevOnly123!"
-      ACCEPT_EULA: "Y"
-    ports: ["1433:1433"]
-  web:
-    build: .
-    environment:
-      ConnectionStrings__Default: "Server=db;Database=EnterprisePortal;User Id=sa;Password=DevOnly123!;TrustServerCertificate=True"
-      Encryption__Key: "dev-only-change-me"
-      Jwt__Key: "dev-only-change-me-jwt-key-must-be-at-least-32-chars"
-    ports: ["5000:8080"]
-    depends_on: [db]
+      ASPNETCORE_ENVIRONMENT: Development
+      Auth__Password: ${PORTAL_DEMO_PASSWORD:?Set PORTAL_DEMO_PASSWORD}
+      Encryption__Key: ${PORTAL_ENCRYPTION_KEY:?Set PORTAL_ENCRYPTION_KEY}
+      Demo__DataPath: /tmp/portal/cases.enc
+    volumes: ["portal-data:/tmp/portal"]
+volumes:
+  portal-data:

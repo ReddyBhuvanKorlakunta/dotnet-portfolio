@@ -1,7 +1,3 @@
-// API client for the .NET portal (02-). Base URL is configurable so the same
-// UI runs against a local API, a staging API, or the offline sample dataset.
-// No auth token is stored in localStorage in this demo — in production the
-// token lives in a httpOnly cookie / secure store, never localStorage.
 export const API_BASE = window.PORTAL_API_BASE || 'http://localhost:5000';
 export async function fetchCases(params = {}) {
   const qs = new URLSearchParams(params).toString();

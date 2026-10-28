@@ -2,9 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using EnterprisePortal.Application.Cases;
 namespace EnterprisePortal.Infrastructure.Security;
-/// <summary>AES-GCM for sensitive fields. Key MUST come from configuration /
-/// Azure Key Vault in production. The fallback below is dev-only and is
-/// refused at startup when the environment is Production (see Program.cs).</summary>
+
 public class EncryptionService : IEncryptionService
 {
     private readonly byte[] _key;
@@ -12,7 +10,8 @@ public class EncryptionService : IEncryptionService
     {
         if (string.IsNullOrWhiteSpace(keyMaterial))
             throw new InvalidOperationException("Encryption key is not configured. Set Encryption:Key (Key Vault in production).");
-        _key = SHA256.HashData(Encoding.UTF8.GetBytes(keyMaterial));
+        _key = Convert.FromBase64String(keyMaterial);
+        if (_key.Length != 32) throw new ArgumentException("Encryption key must contain 32 random bytes.");
     }
     public string Encrypt(string plain)
     {
@@ -27,6 +26,7 @@ public class EncryptionService : IEncryptionService
     public string Decrypt(string cipherText)
     {
         var all = Convert.FromBase64String(cipherText);
+        if (all.Length < 28) throw new CryptographicException("Invalid encrypted value.");
         var nonce = all[..AesGcm.NonceByteSizes.MaxSize];
         var tag = all.AsSpan(AesGcm.NonceByteSizes.MaxSize, AesGcm.TagByteSizes.MaxSize).ToArray();
         var cipher = all[(AesGcm.NonceByteSizes.MaxSize + AesGcm.TagByteSizes.MaxSize)..];

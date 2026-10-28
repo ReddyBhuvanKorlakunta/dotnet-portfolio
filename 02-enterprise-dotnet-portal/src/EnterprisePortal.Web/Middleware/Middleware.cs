@@ -1,4 +1,5 @@
 namespace EnterprisePortal.Web.Middleware;
+
 public class RequestIdMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext ctx)

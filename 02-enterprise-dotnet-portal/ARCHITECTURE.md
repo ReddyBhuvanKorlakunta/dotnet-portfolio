@@ -1,49 +1,23 @@
-# Architecture — Enterprise Portal
+# Architecture and code map
+| Area | Responsibility |
+| --- | --- |
+| EnterprisePortal.Domain | Case state machine, priority and record rules |
+| EnterprisePortal.Application | Shared orchestration, validation, DTOs and repository contracts |
+| EnterprisePortal.Infrastructure | AES-256-GCM, durable demo snapshots, parameterized SQL adapter and transactions |
+| EnterprisePortal.Web | Cookie authentication, role checks, CSRF, MVC, API, rate limits and HTTP headers |
+| EnterprisePortal.Tests | Executable assertions without a test-framework dependency |
+| frontend | Sass foundations, framework adapter source, Playwright and axe |
+| legacy/WebForms | Independent Windows .NET Framework host |
 
-```
-┌─────────────┐   HTTP / JWT   ┌──────────────────────┐
-│  MVC UI     │ ──────────────▶│  EnterprisePortal.Web│
-│  (Razor)    │   API v1       │  Controllers (thin)  │
-└─────────────┘                └──────────┬───────────┘
-                                          │ CaseService
-                               ┌──────────▼───────────┐
-                               │  Application         │
-                               │  DTOs, services,     │
-                               │  pagination, Result  │
-                               └──────────┬───────────┘
-                                          │ interfaces
-                     ┌───────────────────┼───────────────────┐
-                     ▼                   ▼                   ▼
-              Domain (rules)    Infrastructure (EF Core,    Security
-              Case state        SQL Server, repos,         (AES-GCM,
-              machine, notes    migrations, seed)          Data Protection)
-```
+Controllers and API share the same service and state machine. Only submitted cases enter review. Only cases in review can be approved or rejected; rejection requires a reason. Closed cases do not reopen. Persistence replays recorded transitions to reconstruct the aggregate. A process-level gate holds the demo storage snapshot for the scoped repository lifetime; SQL adds a serializable transaction and locking across processes. Do not scale the file mode to multiple processes. Repository reads hold the gate until the request ends.
 
-## Decisions (ADRs, short form)
-- **Clean Architecture, not a single project.** Controllers stay thin so
-  business rules are testable without HTTP or SQL. The cost is more projects;
-  the payoff is that a developer can test a rule in seconds.
-- **State machine in the domain, not in the controller.** An illegal
-  transition is an exception in `Case`, covered by `CaseDomainTests`, not a
-  string comparison scattered across endpoints.
-- **Soft delete + query filter.** Deleted cases disappear from every query
-  by default; the audit trail is not a second system to remember.
-- **RowVersion concurrency.** Two workers editing the same case get a
-  concurrency error, not a silent overwrite.
-- **JWT in dev, Entra ID in production.** The API trusts the bearer scheme,
-  not the dev issuer, so swapping identity providers changes config, not code.
-- **Strangler Fig for Web Forms.** The legacy page in `legacy/WebForms/`
-  keeps working. New pages are MVC/API. A Web Forms page migrates only when
-  it needs a change — see `docs/strangler.md`.
+The snapshot design makes an easily runnable demonstration with no infrastructure required. It does not claim enterprise-scale query performance. Reflection restores database identity and creation time; a production ORM or dedicated persistence constructor should replace this demo mapping. There is no implemented tenant ownership model. All signed-in demo staff can read all synthetic cases.
 
-## Data flow (create a case)
-UI/API → validation (DataAnnotations) → CaseService → domain Case.Submit()
-→ encrypted notes → repository → UnitOfWork.SaveChanges → SQL Server.
-Every step is logged with a request ID, never with the sensitive value.
+## Design decisions
+Native form controls, clear labels, one primary action, explicit status text and a focusable error summary support predictable workflows. HTML5 supplies landmarks and semantic tables. Sass tokens unify visual behavior. Bootstrap/Material adapters show how framework appearance can map to approved foundations; framework imports are not themselves a governed design system. Component acceptance includes keyboard behavior, errors, contrast, reflow, content guidance and ownership. Designer collaboration and user research in this project are proposed practices, not claimed past research.
 
-## Non-functional
-- Pagination capped at 100/page, search is parameterised (EF Core, never
-  string-built SQL), security headers on every response, health check at
-  `/health`, audit log: who / what / when / request ID.
-- Production checklist in SECURITY.md: Key Vault secrets, Entra ID, TLS,
-  backup/restore test, migration review before apply.
+## Sources
+- https://learn.microsoft.com/aspnet/core/security/
+- https://learn.microsoft.com/aspnet/web-forms/overview/security/
+- https://www.w3.org/TR/WCAG21/
+- https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html
